@@ -21,6 +21,18 @@ def send_message_to_user(contact, msg):
 
     return call_applescript(send_to_user)
 
+def send_message_to_chat(chat_name, msg):
+	send_to_chat = f"""
+        tell application "Messages"
+	        send "{msg}" to chat "{chat_name}"
+        end tell
+    """
+
+	print(send_to_chat)
+	
+	return call_applescript(send_to_chat)
+
+
 def parse_aliases():
 	if not os.path.isfile(ALIAS_FILE): 
 		with open(ALIAS_FILE, 'w+') as af: pass
@@ -30,10 +42,10 @@ def parse_aliases():
 			for alias in af.readlines()
 		}
 
-def add_alias(name, number):
+def add_alias(name, number, group=False):
 	active = parse_aliases()
 	alias = name.lower().strip()
-	active[alias] = number
+	active[alias] = '~' * group + number
 
 	with open(ALIAS_FILE, 'w+') as af:
 		for k, v in sorted(active.items()):
@@ -45,13 +57,16 @@ if __name__ == "__main__":
 	parser = argparse.ArgumentParser() 
 	
 	parser.add_argument("recipient", nargs="?", help="Alias to send text")
-	parser.add_argument("--alias", nargs=2, metavar=('name', 'number'), help="Alias k-v pair to add")
+	parser.add_argument("--alias", nargs=2, metavar=('name', 'identifier'), help="Alias k-v pair to add")
+	parser.add_argument("--group", action="store_true")
 	parser.add_argument("--list", action="store_true", help="List all aliases")
 	parser.add_argument("message", nargs=argparse.REMAINDER)
 
 	args = parser.parse_args()
+
 	if args.alias:
-		add_alias(*args.alias)
+		add_alias(*args.alias, group=args.group)
+		exit(0)
 
 	aliases = parse_aliases()
 	if args.list:
@@ -62,14 +77,25 @@ if __name__ == "__main__":
 
 	if args.recipient and args.message:
 		to = args.recipient.lower()
-		if to in aliases:		
-			resp = send_message_to_user(
-				aliases[to], " ".join(args.message)
-			)
+		if to in aliases:
+			if not aliases[to].startswith("~"):		
+				resp = send_message_to_user(
+					aliases[to], " ".join(args.message)
+				)
+			else:
+				resp = send_message_to_chat(
+					aliases[to][1:], " ".join(args.message)
+				)
 
 			if resp['code'] != 0: 
-				print("Failed to send message!")
+				print("Failed to send message; make sure alias actually exists!")
 			else:
 				print("Message sent!")
 		else:
-			print(f"Alias {to} could not be located; try adding one with --alias!")
+			resp = send_message_to_chat(args.recipient, " ".join(args.message))
+			if resp['code'] != 0: 
+				print(f"Failed to send message, neither group chat nor alias '{args.recipient}' exist; try adding one with --alias!")
+			else:
+				print("Message sent!")
+	else:
+		parser.print_help()
