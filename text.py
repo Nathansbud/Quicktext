@@ -5,9 +5,9 @@ from subprocess import Popen, PIPE
 
 ALIAS_FILE = os.path.join(os.path.dirname(__file__), "aliases.txt")
 
-def call_applescript(script):
+def call_applescript(script, *args):
     p = Popen(['osascript'], stdin=PIPE, stdout=PIPE, stderr=PIPE, universal_newlines=True)
-    stdout, stderr = p.communicate(script)
+    stdout, stderr = p.communicate(f"{script} {' '.join(args)}")
     return {"output": stdout, "error": stderr, "code": p.returncode}
 
 def send_message_to_user(contact, msg):
