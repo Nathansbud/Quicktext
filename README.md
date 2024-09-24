@@ -6,11 +6,11 @@
 And, a quick shell script recipe for generating a `.vcf` contact dump:
 
 ```bash
-	osascript "export.applescript" "$@"
-	failed=$?
-	if [[ failed -eq 0 ]]
-	then
-		/some/version/with/dependencies/of/python3 contacter.py;
-		open ScriptContacts;
-	fi
+osascript "export.applescript" "$@"
+failed=$?
+if [[ failed -eq 0 ]]
+then
+	/some/version/with/dependencies/of/python3 contacter.py;
+	open ScriptContacts;
+fi
 ```
