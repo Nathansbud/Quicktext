@@ -11,7 +11,7 @@ PERSONAL = []
 def run_contacter():
     clipboard = pyperclip.paste()
     lines = sorted(
-        [l.split("@") for l in clipboard.splitlines()] + [PERSONAL],
+        [l.split("@@@@@@") for l in clipboard.splitlines()] + [PERSONAL],
         key=lambda v: v[1]
     )
 

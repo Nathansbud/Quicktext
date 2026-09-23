@@ -18,7 +18,7 @@ on run argv
 		set itemOffset to 1
 		set builtOutput to ""
 		repeat (number of chatNames) times
-			set builtOutput to builtOutput & (item itemOffset of chatNumbers) & " @ " & (item itemOffset of chatNames) & linefeed
+			set builtOutput to builtOutput & (item itemOffset of chatNumbers) & " @@@@@@ " & (item itemOffset of chatNames) & linefeed
 			set itemOffset to itemOffset + 1
 		end repeat
 				
